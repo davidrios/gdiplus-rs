@@ -7,7 +7,7 @@ license = "MIT"
 description = "Rust API for GDI+"
 repository = "https://github.com/davidrios/gdiplus-rs"
 readme = "README.md"
-keywords = ["windows", "win32", "gdiplus", "gdi+"]
+keywords = ["windows", "win32", "gdiplus", "gdip"]
 categories = ["os::windows-apis"]
 include = ["/src/**/*", "/Cargo.toml", "/LICENSE", "/README.md"]
 
