@@ -12,4 +12,3 @@ categories = ["os::windows-apis"]
 include = ["/src/**/*", "/Cargo.toml", "/LICENSE", "/README.md"]
 
 [dependencies]
-gdiplus-sys = { git = "https://github.com/davidrios/gdiplus-sys" }
