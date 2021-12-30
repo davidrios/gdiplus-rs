@@ -1,4 +1,5 @@
 #![cfg(windows)]
+pub mod brush;
 pub mod color;
 pub mod enums;
 pub mod graphics;
@@ -7,6 +8,7 @@ mod macros;
 pub mod pen;
 pub mod types;
 
+pub use crate::brush::SolidBrush;
 pub use crate::color::Color;
 pub use crate::graphics::Graphics;
 pub use crate::init::GdiPlus;

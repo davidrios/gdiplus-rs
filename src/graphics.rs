@@ -1,9 +1,11 @@
 use std::mem::MaybeUninit;
 
 use gdiplus_sys2::{
-    GdipCreateFromHDC, GdipDeleteGraphics, GdipDrawLine, GdipSetSmoothingMode, GpGraphics, HDC,
+    GdipCreateFromHDC, GdipDeleteGraphics, GdipDrawLine, GdipFillRectangle, GdipSetSmoothingMode,
+    GpGraphics, HDC, REAL,
 };
 
+use crate::brush::SolidBrush;
 use crate::enums::SmoothingMode;
 use crate::pen::Pen;
 use crate::types::{Point, Result};
@@ -29,6 +31,10 @@ impl Graphics {
     pub fn set_smoothing_mode(&mut self, smoothing_mode: SmoothingMode) -> Result<&mut Self> {
         return_iferror!(GdipSetSmoothingMode(self.graphics, smoothing_mode as i32));
         Ok(self)
+    }
+
+    pub fn with_brush<'a>(&'a mut self, brush: &'a mut SolidBrush) -> WithBrush<'a> {
+        WithBrush::new(self, brush)
     }
 
     pub fn with_pen<'a>(&'a mut self, pen: &'a mut Pen) -> WithPen<'a> {
@@ -97,6 +103,44 @@ impl<'a> WithPen<'a> {
             from.1,
             to.0,
             to.1,
+        ));
+
+        Ok(self)
+    }
+}
+
+pub struct WithBrush<'a> {
+    graphics: &'a mut Graphics,
+    brush: &'a mut SolidBrush,
+}
+impl<'a> WithBrush<'a> {
+    pub fn new(graphics: &'a mut Graphics, brush: &'a mut SolidBrush) -> Self {
+        Self { graphics, brush }
+    }
+
+    pub fn modify(&mut self, fn_: fn(&mut SolidBrush) -> Result<()>) -> Result<&mut Self> {
+        fn_(self.brush)?;
+        Ok(self)
+    }
+
+    pub fn replace(&mut self, brush: &'a mut SolidBrush) -> &mut Self {
+        self.brush = brush;
+        self
+    }
+
+    pub fn fill_rectangle(
+        &mut self,
+        position: Point,
+        width: REAL,
+        height: REAL,
+    ) -> Result<&mut Self> {
+        return_iferror!(GdipFillRectangle(
+            self.graphics.graphics(),
+            self.brush.brush(),
+            position.0,
+            position.1,
+            width,
+            height,
         ));
 
         Ok(self)

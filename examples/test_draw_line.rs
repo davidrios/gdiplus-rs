@@ -6,11 +6,11 @@ mod lib;
 use std::ptr;
 
 use gdiplus::enums::SmoothingMode;
-use gdiplus::{color, Color, GdiPlus, Graphics, Pen, Result as GdipResult};
+use gdiplus::{color, Color, GdiPlus, Graphics, Pen, Result as GdipResult, SolidBrush};
 use winapi::shared::minwindef::*;
 use winapi::shared::windef::*;
 use winapi::um::libloaderapi::GetModuleHandleW;
-use winapi::um::wingdi::*;
+// use winapi::um::wingdi::*;
 use winapi::um::winuser::*;
 
 use crate::lib::*;
@@ -24,16 +24,32 @@ extern "system" fn wnd_proc(hwnd: HWND, message: UINT, wparam: WPARAM, lparam: L
             let mut ps = PAINTSTRUCT::default();
             let hdc = wpanic_ifnull!(BeginPaint(hwnd, &mut ps));
 
-            let bg_color = RGB(250, 250, 250);
-            let bg_brush = wpanic_ifnull!(CreateSolidBrush(bg_color));
+            let mut rect = RECT::default();
+            wpanic_ifeq!(GetClientRect(hwnd, &mut rect), FALSE);
 
-            wpanic_ifeq!(FillRect(hdc, &ps.rcPaint, bg_brush), 0);
-            wpanic_ifeq!(DeleteObject(bg_brush as _), FALSE);
+            rect.left -= 1;
+            rect.top -= 1;
+            rect.right += 1;
+            rect.bottom += 1;
+
+            // let bg_color = RGB(250, 250, 250);
+            // let bg_brush = wpanic_ifnull!(CreateSolidBrush(bg_color));
+
+            // wpanic_ifeq!(FillRect(hdc, &ps.rcPaint, bg_brush), 0);
+            // wpanic_ifeq!(DeleteObject(bg_brush as _), FALSE);
 
             (|| -> GdipResult<()> {
                 let mut graphics = Graphics::from_hdc(hdc)?;
 
                 graphics.set_smoothing_mode(SmoothingMode::AntiAlias)?;
+
+                graphics
+                    .with_brush(&mut SolidBrush::new(&Color::from(color::LIGHT_GRAY))?)
+                    .fill_rectangle(
+                        (rect.left as _, rect.top as _),
+                        rect.right as _,
+                        rect.bottom as _,
+                    )?;
 
                 let mut pen = Pen::new(&Color::from(color::RED), 2.5)?;
                 let mut pen2 = pen.try_clone()?;
