@@ -12,3 +12,15 @@ categories = ["os::windows-apis"]
 include = ["/src/**/*", "/Cargo.toml", "/LICENSE", "/README.md"]
 
 [dependencies]
+gdiplus-sys2 = "0.1"
+winapi = { version = "0.3", features = [
+    "windef",
+]}
+
+[dev-dependencies]
+winapi = { version = "0.3", features = [
+    "impl-default",
+    "libloaderapi",
+    "winerror",
+    "winuser",
+]}
