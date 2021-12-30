@@ -10,7 +10,6 @@ use gdiplus::{color, Color, GdiPlus, Graphics, Pen, Result as GdipResult, SolidB
 use winapi::shared::minwindef::*;
 use winapi::shared::windef::*;
 use winapi::um::libloaderapi::GetModuleHandleW;
-// use winapi::um::wingdi::*;
 use winapi::um::winuser::*;
 
 use crate::lib::*;
@@ -32,16 +31,8 @@ extern "system" fn wnd_proc(hwnd: HWND, message: UINT, wparam: WPARAM, lparam: L
             rect.right += 1;
             rect.bottom += 1;
 
-            // let bg_color = RGB(250, 250, 250);
-            // let bg_brush = wpanic_ifnull!(CreateSolidBrush(bg_color));
-
-            // wpanic_ifeq!(FillRect(hdc, &ps.rcPaint, bg_brush), 0);
-            // wpanic_ifeq!(DeleteObject(bg_brush as _), FALSE);
-
             (|| -> GdipResult<()> {
                 let mut graphics = Graphics::from_hdc(hdc)?;
-
-                graphics.set_smoothing_mode(SmoothingMode::AntiAlias)?;
 
                 graphics
                     .with_brush(&mut SolidBrush::new(&Color::from(color::LIGHT_GRAY))?)
@@ -50,6 +41,8 @@ extern "system" fn wnd_proc(hwnd: HWND, message: UINT, wparam: WPARAM, lparam: L
                         rect.right as _,
                         rect.bottom as _,
                     )?;
+
+                graphics.set_smoothing_mode(SmoothingMode::AntiAlias)?;
 
                 let mut pen = Pen::new(&Color::from(color::RED), 2.5)?;
                 let mut pen2 = pen.try_clone()?;
